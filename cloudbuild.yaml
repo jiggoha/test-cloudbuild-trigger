@@ -23,3 +23,4 @@ steps:
     entrypoint: bash
 substitutions:
   _ENTRIES_DIR: entriesDir
+  _BUCKET: tlog
