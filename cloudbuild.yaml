@@ -1,0 +1,25 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - '-c'
+      - >
+        docker pull gcr.io/trillian-opensource-ci/witness && echo $(docker
+        images --format '{{.Digest}}' gcr.io/trillian-opensource-ci/witness) >
+        /workspace/image-digest.txt
+    id: store-witness-image-digest
+    entrypoint: bash
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - '-c'
+      - |-
+        gcloud functions call create_gcs_object --data="{
+          \"bucket\":\"${_BUCKET}\",
+          \"entryContent\":\"${REPO_NAME},${COMMIT_SHA},$(cat /workspace/image-digest.txt)\",
+          \"entryPath\":\"${_ENTRIES_DIR}/${REPO_NAME}-${COMMIT_SHA}\"
+        }"
+    id: write-to-gcs
+    waitFor:
+      - store-witness-image-digest
+    entrypoint: bash
+substitutions:
+  _ENTRIES_DIR: entriesDir
