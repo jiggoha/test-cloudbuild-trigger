@@ -1,0 +1,12 @@
+steps:
+  - name: golang:1.19
+    entrypoint: /bin/bash
+    args: 
+      - -c
+      - |
+        echo "~~~start start"
+        wget https://github.com/usbarmory/tamago-go/archive/refs/tags/latest.zip
+        unzip latest.zip
+        cd tamago-go-latest/src && ./all.bash
+        cd ../bin && export TAMAGO=`pwd`/go
+        echo "~~~done done"
